@@ -1,5 +1,8 @@
 from __future__ import print_function
+from asyncio.windows_events import NULL
+from importlib.resources import contents
 import sys
+import math
 
 totalTime = 0
 lastPlaceInQueue = 0
@@ -21,27 +24,56 @@ def main():
     if (isinstance(args[2], int) == False):
         print("Enter an integer value for parameter two.... exiting")
         exit(0)
-    q = []
-    q = openFile(args[3], args[2])
-    for i in q:
-        print(f"{i}")
+    q = readIn(args[3], args[2])
+    if (args[1] == "FIFO"):
+        fifo(args[2], q)
+        print(f"Our total time is: {totalTime} milliseconds")
+    #for i in q:
+        #print(f"{i}")
+    exit(0)
 
 """This method opens the file and reads in the data """
-def openFile(file, qSize):
-    valid = True
+def readIn(file, qSize):
+    global lastPlaceInQueue
     x = 0
     queueList = []
     with open(file, 'r') as f:
         for line in f.readlines():
-            #print(f"{line}")
-            if (x <= qSize - 1):
-                queueList.append(line.rstrip('\n'))
-                x += 1
-            else:
-                break
+            queueList.append(line.rstrip('\n'))
     return queueList
 
-#Test
+
+
+def fillQueue(q, lastIndex, indexToFill):
+    if (indexToFill is None):
+        nextValue = q[lastIndex]
+    return nextValue
+
+
+
+"""This method will run the FIFO algorithm to store our data"""
+def fifo(qSize, queue):
+    global totalTime
+    cylinder = 0
+    count = 0
+    for i in queue:
+        if (count <= qSize -1):
+            time = (1 + (abs(cylinder - int(i)) * .15) + 1) + 4.2
+            cylinder = int(i)
+            totalTime += time
+            count += 1
+            queue.pop()
+            queue.append(fillQueue(queue, qSize + 1, None))
+        else:
+            break
+    
+
+def sstf(queue):
+    global totalTime
+    cylinder = 0
+    for i in queue:
+        i += i
+
 
 main()
 
